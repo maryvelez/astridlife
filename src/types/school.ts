@@ -38,6 +38,17 @@ export interface UserCourse {
   course?: Course;
 }
 
+export interface SchoolTask {
+  id: string;
+  user_id: string;
+  course_id: string;
+  title: string;
+  description: string;
+  due_date: string;
+  status: 'todo' | 'in_progress' | 'completed';
+  priority: 'low' | 'medium' | 'high';
+}
+
 export interface SchoolProgress {
   totalCredits: number;
   completedCredits: number;
