@@ -1,14 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
 
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const supabase = createClientComponentClient();
-  const router = useRouter();
 
   useEffect(() => {
     const checkUser = async () => {

@@ -78,6 +78,7 @@ export default function GoalsPage() {
           </div>
         </div>
       </div>
+      <p className="text-gray-400">You haven&apos;t set any goals yet.</p>
     </main>
   );
 }

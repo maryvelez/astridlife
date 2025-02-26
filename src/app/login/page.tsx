@@ -3,7 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import Link from 'next/link';
+
+interface AuthError {
+  message: string;
+  status?: number;
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -11,7 +15,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<AuthError | null>(null);
   const [loading, setLoading] = useState(false);
   const [text, setText] = useState('');
   const fullText = "welcome back, friend.";
@@ -37,7 +41,7 @@ export default function LoginPage() {
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError(null);
 
     try {
       if (isSignUp) {
@@ -58,7 +62,7 @@ export default function LoginPage() {
         router.push('/bubbles');
       }
     } catch (error: any) {
-      setError(error.message);
+      setError({ message: error.message });
     } finally {
       setLoading(false);
     }
@@ -98,7 +102,7 @@ export default function LoginPage() {
             
             {error && (
               <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg backdrop-blur-sm">
-                <p className="text-red-400 text-sm">{error}</p>
+                <p className="text-red-400 text-sm">{error.message}</p>
               </div>
             )}
 

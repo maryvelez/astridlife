@@ -246,6 +246,11 @@ export default function HealthPage() {
             ))}
           </div>
         </div>
+        <div className="mt-12 text-center">
+          <p className="text-gray-600">Let&apos;s track your health journey</p>
+          <p className="text-gray-600">Here&apos;s your daily progress</p>
+          <p className="text-gray-600">You&apos;re doing great!</p>
+        </div>
       </div>
     </main>
   );

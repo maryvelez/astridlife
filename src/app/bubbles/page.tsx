@@ -14,8 +14,11 @@ interface Profile {
 }
 
 export default function Bubbles() {
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<{
+    id: string;
+    name: string;
+    age: number;
+  } | null>(null);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [loading, setLoading] = useState(true);
   const supabase = createClientComponentClient();
@@ -29,7 +32,6 @@ export default function Bubbles() {
           router.push('/login');
           return;
         }
-        setUser(session.user);
 
         // Fetch profile
         const { data: profile, error } = await supabase
