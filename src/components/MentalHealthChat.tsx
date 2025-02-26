@@ -9,10 +9,8 @@ interface Message {
 
 export default function MentalHealthChat() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { text: "Hi! I'm here to listen and chat. How are you feeling today?", isUser: false }
-  ]);
-  const [inputValue, setInputValue] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -25,10 +23,10 @@ export default function MentalHealthChat() {
   }, [messages]);
 
   const handleSend = async () => {
-    if (!inputValue.trim()) return;
+    if (!newMessage.trim()) return;
 
-    const userMessage = inputValue.trim();
-    setInputValue('');
+    const userMessage = newMessage.trim();
+    setNewMessage('');
     setMessages(prev => [...prev, { text: userMessage, isUser: true }]);
     setIsLoading(true);
 
@@ -130,8 +128,8 @@ export default function MentalHealthChat() {
             <div className="flex space-x-2">
               <input
                 type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                 placeholder="Type your message..."
                 className="flex-1 px-4 py-2 bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/20 focus:border-white/40 rounded-lg focus:outline-none text-white placeholder-gray-400"

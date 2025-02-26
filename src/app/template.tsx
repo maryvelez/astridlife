@@ -5,7 +5,11 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-export default function Template({ children }: { children: React.ReactNode }) {
+interface TemplateProps {
+  children: React.ReactNode;
+}
+
+export default function Template({ children }: TemplateProps) {
   const [user, setUser] = useState<any>(null);
   const supabase = createClientComponentClient();
   const pathname = usePathname();

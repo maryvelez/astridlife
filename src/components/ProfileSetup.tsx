@@ -45,13 +45,13 @@ export default function ProfileSetup({ onComplete }: ProfileSetupProps) {
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-8 w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">
-          Welcome! Let's set up your profile
+          Welcome! Let&apos;s set up your profile
         </h2>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
-              What's your name?
+              What&apos;s your name?
             </label>
             <input
               type="text"
