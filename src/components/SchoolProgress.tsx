@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useSupabase } from '@/app/supabase-provider';
-import { Program, UserProgram, UserCourse, SchoolProgress } from '@/types/school';
+import { Program, UserProgram, UserCourse, SchoolProgress as SchoolProgressType } from '@/types/school';
 import { CircularProgress, Card, CardContent } from '@/components/ui';
 
 export default function SchoolProgress() {
   const { supabase, session } = useSupabase();
   const [programs, setPrograms] = useState<Program[]>([]);
   const [userProgram, setUserProgram] = useState<UserProgram | null>(null);
-  const [progress, setProgress] = useState<SchoolProgress>({
+  const [progress, setProgress] = useState<SchoolProgressType>({
     totalCredits: 0,
     completedCredits: 0,
     inProgressCredits: 0,
