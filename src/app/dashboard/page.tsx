@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import SchoolProgress from '@/components/SchoolProgress';
+import MentalHealthChat from '@/components/MentalHealthChat'; // Assuming MentalHealthChat is a component
 
 interface User {
   id: string;
@@ -51,6 +53,17 @@ export default function Dashboard() {
           >
             Sign Out
           </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <h2 className="text-xl font-semibold mb-4">School Progress</h2>
+            <SchoolProgress />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Mental Health Support</h2>
+            <MentalHealthChat />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
