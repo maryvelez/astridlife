@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import SchoolProgress from '@/components/SchoolProgress';
@@ -9,6 +9,7 @@ import MentalHealthChat from '@/components/MentalHealthChat';
 export default function SchoolPage() {
   const supabase = createClientComponentClient();
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getSession = async () => {
@@ -16,11 +17,12 @@ export default function SchoolPage() {
       if (!session) {
         router.push('/login');
       }
+      setLoading(false);
     };
     getSession();
   }, [supabase, router]);
 
-  if (!supabase.auth.session()) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-600"></div>
