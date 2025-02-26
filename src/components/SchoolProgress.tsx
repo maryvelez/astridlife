@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSupabase } from '@/app/supabase-provider';
-import { Program, UserProgram, UserCourse, SchoolProgress as SchoolProgressType } from '@/types/school';
+import { Program, UserProgram, SchoolProgress as SchoolProgressType } from '@/types/school';
 import { CircularProgress, Card, CardContent } from '@/components/ui';
 
 export default function SchoolProgress() {
@@ -19,20 +19,7 @@ export default function SchoolProgress() {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (session?.user) {
-      loadPrograms();
-      loadUserProgram();
-    }
-  }, [session]);
-
-  useEffect(() => {
-    if (userProgram) {
-      loadCourses();
-    }
-  }, [userProgram]);
-
-  const loadPrograms = async () => {
+  const loadPrograms = useCallback(async () => {
     const { data: programs, error } = await supabase
       .from('programs')
       .select('*');
@@ -43,13 +30,15 @@ export default function SchoolProgress() {
     }
 
     setPrograms(programs);
-  };
+  }, [supabase]);
 
-  const loadUserProgram = async () => {
+  const loadUserProgram = useCallback(async () => {
+    if (!session?.user?.id) return;
+
     const { data: userPrograms, error } = await supabase
       .from('user_programs')
       .select('*, program:programs(*)')
-      .eq('user_id', session?.user?.id)
+      .eq('user_id', session.user.id)
       .single();
 
     if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
@@ -58,15 +47,15 @@ export default function SchoolProgress() {
     }
 
     setUserProgram(userPrograms);
-  };
+  }, [supabase, session?.user?.id]);
 
-  const loadCourses = async () => {
-    if (!userProgram?.program_id) return;
+  const loadCourses = useCallback(async () => {
+    if (!userProgram?.program_id || !session?.user?.id) return;
 
     const { data: courses, error } = await supabase
       .from('user_courses')
       .select('*, course:courses(*)')
-      .eq('user_id', session?.user?.id);
+      .eq('user_id', session.user.id);
 
     if (error) {
       console.error('Error loading courses:', error);
@@ -94,10 +83,23 @@ export default function SchoolProgress() {
     });
 
     setLoading(false);
-  };
+  }, [supabase, userProgram?.program_id, session?.user?.id, userProgram?.program?.total_credits]);
+
+  useEffect(() => {
+    if (session?.user) {
+      loadPrograms();
+      loadUserProgram();
+    }
+  }, [session?.user, loadPrograms, loadUserProgram]);
+
+  useEffect(() => {
+    if (userProgram) {
+      loadCourses();
+    }
+  }, [userProgram, loadCourses]);
 
   const handleProgramSelect = async (programId: string) => {
-    if (!session?.user) return;
+    if (!session?.user?.id) return;
 
     const { error } = await supabase
       .from('user_programs')
