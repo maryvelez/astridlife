@@ -47,6 +47,116 @@ export interface Database {
           user_id?: string
         }
       }
+      programs: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          total_credits: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          total_credits: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          total_credits?: number
+          created_at?: string
+        }
+      }
+      courses: {
+        Row: {
+          id: string
+          program_id: string
+          name: string
+          code: string
+          credits: number
+          description: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          program_id: string
+          name: string
+          code: string
+          credits: number
+          description?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          program_id?: string
+          name?: string
+          code?: string
+          credits?: number
+          description?: string | null
+          created_at?: string
+        }
+      }
+      user_programs: {
+        Row: {
+          id: string
+          user_id: string
+          program_id: string
+          start_date: string
+          expected_completion_date: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          program_id: string
+          start_date: string
+          expected_completion_date?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          program_id?: string
+          start_date?: string
+          expected_completion_date?: string | null
+          created_at?: string
+        }
+      }
+      user_courses: {
+        Row: {
+          id: string
+          user_id: string
+          course_id: string
+          status: 'not_started' | 'in_progress' | 'completed'
+          grade: string | null
+          start_date: string | null
+          completion_date: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          course_id: string
+          status?: 'not_started' | 'in_progress' | 'completed'
+          grade?: string | null
+          start_date?: string | null
+          completion_date?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          course_id?: string
+          status?: 'not_started' | 'in_progress' | 'completed'
+          grade?: string | null
+          start_date?: string | null
+          completion_date?: string | null
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

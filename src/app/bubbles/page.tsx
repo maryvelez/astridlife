@@ -81,10 +81,11 @@ export default function Bubbles() {
   }
 
   const brainCards = [
-    { href: '/work', icon: '💼', label: 'Work', angle: -Math.PI/4 },
-    { href: '/health', icon: '🧘‍♀️', label: 'Health', angle: Math.PI/4 },
-    { href: '/growth', icon: '🌱', label: 'Growth', angle: -3*Math.PI/4 },
-    { href: '/social', icon: '👥', label: 'Social', angle: 3*Math.PI/4 }
+    { href: '/work', icon: '💼', label: 'Work', angle: -Math.PI/6 },
+    { href: '/health', icon: '🧘‍♀️', label: 'Health', angle: Math.PI/6 },
+    { href: '/growth', icon: '🌱', label: 'Growth', angle: -Math.PI/2 },
+    { href: '/school', icon: '📚', label: 'School', angle: Math.PI/2 },
+    { href: '/social', icon: '👥', label: 'Social', angle: -5*Math.PI/6 }
   ];
 
   return (
@@ -99,65 +100,50 @@ export default function Bubbles() {
       </div>
 
       {/* Lock Button */}
-      <button
-        onClick={handleSignOut}
-        className="fixed top-4 right-4 z-50 p-2 text-gray-400 hover:text-white transition-colors group"
-        title="Lock your space"
-      >
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          viewBox="0 0 24 24" 
-          fill="currentColor" 
-          className="w-6 h-6 transform group-hover:scale-110 transition-transform"
+      <div className="absolute top-4 right-4 z-10">
+        <button
+          onClick={handleSignOut}
+          className="p-3 rounded-full bg-white/5 hover:bg-white/10 transition-colors"
         >
-          <path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" />
-        </svg>
-      </button>
-
-      <div className="cards-container relative z-10">
-        {/* Central Name */}
-        <Link 
-          href="/profile"
-          className="central-name cursor-pointer"
-        >
-          <p className="greeting text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">
-            Hi {profile?.name || 'friend'}
-          </p>
-          {profile?.age && (
-            <p className="age text-gray-400">{profile.age}</p>
-          )}
-        </Link>
-
-        {/* Brain Cards */}
-        {brainCards.map((card) => (
-          <Link
-            href={card.href}
-            key={card.href}
-            className="brain-card group"
-            style={{
-              left: `calc(50% + ${Math.cos(card.angle) * 200}px)`,
-              top: `calc(50% + ${Math.sin(card.angle) * 200}px)`,
-              transform: 'translate(-50%, -50%)'
-            }}
-          >
-            <div className="brain-card-content relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-blue-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative p-6 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full hover:border-white/20 transition-all transform hover:scale-[1.02] flex flex-col items-center">
-                <span className="text-4xl mb-2">{card.icon}</span>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 font-semibold">
-                  {card.label}
-                </span>
-              </div>
-            </div>
-          </Link>
-        ))}
-
-        {/* Donut Ring */}
-        <div className="donut-ring border-2 border-white/5"></div>
+          <span role="img" aria-label="lock" className="text-xl">🔒</span>
+        </button>
       </div>
 
+      {/* Center Brain Icon */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <div className="relative w-32 h-32 flex items-center justify-center">
+          <div className="text-6xl animate-float">🧠</div>
+        </div>
+      </div>
+
+      {/* Orbiting Cards */}
+      {brainCards.map((card, index) => {
+        const radius = 180; // Distance from center
+        const x = Math.cos(card.angle) * radius;
+        const y = Math.sin(card.angle) * radius;
+
+        return (
+          <Link
+            key={card.href}
+            href={card.href}
+            className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+              w-24 h-24 rounded-full bg-white/5 hover:bg-white/10 transition-all
+              flex flex-col items-center justify-center text-white
+              hover:scale-110 hover:shadow-lg hover:shadow-purple-500/20`}
+            style={{
+              transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
+            }}
+          >
+            <span role="img" aria-label={card.label} className="text-3xl mb-1">{card.icon}</span>
+            <span className="text-sm font-medium">{card.label}</span>
+          </Link>
+        );
+      })}
+
       {/* Mental Health Chat */}
-      <MentalHealthChat />
+      <div className="fixed bottom-8 right-8">
+        <MentalHealthChat />
+      </div>
     </div>
   );
 }
