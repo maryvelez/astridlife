@@ -31,21 +31,38 @@ export default function MentalHealthChat() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
+      console.log('Sending request with token:', process.env.NEXT_PUBLIC_HUGGING_FACE_TOKEN?.slice(0, 5) + '...');
+      
+      const response = await fetch('https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${process.env.NEXT_PUBLIC_HUGGING_FACE_TOKEN}`
         },
-        body: JSON.stringify({ inputs: userMessage })
+        body: JSON.stringify({
+          inputs: {
+            past_user_inputs: messages.filter(m => m.isUser).map(m => m.text).slice(-5),
+            generated_responses: messages.filter(m => !m.isUser).map(m => m.text).slice(-5),
+            text: userMessage
+          }
+        })
       });
 
       const data = await response.json();
-      const botResponse = data[0]?.generated_text || "I'm not sure how to respond to that.";
-      
+      console.log('Response:', data);
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to get response');
+      }
+
+      const botResponse = data.generated_text || "I'm not sure how to respond to that.";
       setMessages(prev => [...prev, { text: botResponse, isUser: false }]);
-    } catch {
-      setMessages(prev => [...prev, { text: "Sorry, I'm having trouble connecting right now.", isUser: false }]);
+    } catch (error) {
+      console.error('Error:', error);
+      setMessages(prev => [...prev, { 
+        text: "Sorry, I'm having trouble connecting right now. Please try again.", 
+        isUser: false 
+      }]);
     } finally {
       setIsLoading(false);
     }
