@@ -8,11 +8,6 @@ import MentalHealthChat from '@/components/MentalHealthChat';
 import ProfileSetup from '@/components/ProfileSetup';
 
 export default function Bubbles() {
-  const [profile, setProfile] = useState<{
-    id: string;
-    name: string;
-    age: number;
-  } | null>(null);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [loading, setLoading] = useState(true);
   const supabase = createClientComponentClient();
@@ -41,8 +36,6 @@ export default function Bubbles() {
 
         if (!profile || (profile.name === null && profile.age === null)) {
           setShowProfileSetup(true);
-        } else {
-          setProfile(profile);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -58,17 +51,7 @@ export default function Bubbles() {
     router.push('/');
   };
 
-  const handleProfileComplete = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', session.user.id)
-      .single();
-
-    setProfile(profile);
+  const handleProfileComplete = () => {
     setShowProfileSetup(false);
   };
 
