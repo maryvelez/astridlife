@@ -25,76 +25,67 @@ export default function MentalHealthChat() {
   const handleSend = async () => {
     if (!newMessage.trim()) return;
 
-    const userMessage = newMessage.trim();
+    const userMessage = newMessage.trim().toLowerCase();
     setNewMessage('');
     setMessages(prev => [...prev, { text: userMessage, isUser: true }]);
     setIsLoading(true);
 
     try {
-      console.log('Sending request with token:', process.env.NEXT_PUBLIC_HUGGING_FACE_TOKEN?.slice(0, 5) + '...');
-      
-      // Format the prompt to encourage appropriate, supportive responses
-      const safePrompt = `You are a kind and professional mental health supporter. Respond with empathy and care to: ${userMessage}`;
-      
-      const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-large', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_HUGGING_FACE_TOKEN?.trim()}`
-        },
-        body: JSON.stringify({
-          inputs: safePrompt,
-          parameters: {
-            max_length: 100,
-            temperature: 0.7,
-            top_p: 0.9,
-            repetition_penalty: 1.2,
-            do_sample: true
-          }
-        })
-      });
-
-      const data = await response.json();
-      console.log('Response:', data);
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to get response');
+      // Handle greetings
+      if (userMessage.match(/^(hi|hello|hey|good morning|good evening|good afternoon)$/i)) {
+        setMessages(prev => [...prev, { 
+          text: "Hi! I'm here to chat and support you. How are you feeling today?", 
+          isUser: false 
+        }]);
+        setIsLoading(false);
+        return;
       }
 
-      let botResponse;
-      if (Array.isArray(data) && data[0]?.generated_text) {
-        botResponse = data[0].generated_text;
-      } else if (data.generated_text) {
-        botResponse = data.generated_text;
-      } else if (typeof data === 'string') {
-        botResponse = data;
-      } else {
-        botResponse = "I'm here to support you. How can I help you today?";
-      }
-
-      // Clean up and validate the response
-      botResponse = botResponse
-        .replace(/^"|"$/g, '') // Remove surrounding quotes
-        .replace(/\\n/g, ' ') // Replace newlines with spaces
-        .trim();
-
-      // Default supportive responses if the model fails
-      if (!botResponse || botResponse.length < 10) {
-        const supportiveResponses = [
-          "I'm here to support you. Would you like to tell me more about how you're feeling?",
-          "That sounds challenging. How can I help you process these feelings?",
-          "I hear you. Would you like to explore this further?",
-          "Your feelings are valid. Let's work through this together.",
-          "Thank you for sharing. What kind of support would be most helpful right now?"
+      // Handle "I am sad" or similar emotions
+      if (userMessage.match(/^(i'?m|i am|feeling|feel)\s+(sad|depressed|down|upset|anxious|worried|stressed)/i)) {
+        const responses = [
+          "I hear you, and it's completely valid to feel that way. Would you like to tell me more about what's making you feel this way?",
+          "I'm here to listen. Can you share what's been happening that's making you feel this way? Sometimes talking about it can help.",
+          "That must be really difficult. Would you like to explore what's contributing to these feelings? I'm here to support you.",
+          "Thank you for sharing that with me. It takes courage to express these feelings. What do you think triggered these emotions?"
         ];
-        botResponse = supportiveResponses[Math.floor(Math.random() * supportiveResponses.length)];
+        const response = responses[Math.floor(Math.random() * responses.length)];
+        setMessages(prev => [...prev, { text: response, isUser: false }]);
+        setIsLoading(false);
+        return;
       }
 
-      setMessages(prev => [...prev, { text: botResponse, isUser: false }]);
+      // Handle "I need help" or similar requests
+      if (userMessage.match(/^(i need|help|can you|please)/i)) {
+        const responses = [
+          "I'm here to help. What kind of support would be most helpful right now?",
+          "You're taking a positive step by reaching out. What's on your mind?",
+          "I'm listening and I want to help. Can you tell me more about what you're going through?",
+          "Thank you for reaching out. Let's work through this together. What's troubling you?"
+        ];
+        const response = responses[Math.floor(Math.random() * responses.length)];
+        setMessages(prev => [...prev, { text: response, isUser: false }]);
+        setIsLoading(false);
+        return;
+      }
+
+      // For other messages, use a supportive response
+      const supportiveResponses = [
+        "I'm listening. Can you tell me more about that?",
+        "Thank you for sharing. How long have you been feeling this way?",
+        "That sounds challenging. What do you think would help you feel better right now?",
+        "I hear you. Would you like to explore this further?",
+        "Your feelings are valid. What kind of support would be most helpful?",
+        "I'm here to support you. Would you like to talk more about what's on your mind?"
+      ];
+      
+      const response = supportiveResponses[Math.floor(Math.random() * supportiveResponses.length)];
+      setMessages(prev => [...prev, { text: response, isUser: false }]);
+
     } catch (error) {
       console.error('Error:', error);
       setMessages(prev => [...prev, { 
-        text: "Sorry, I'm having trouble connecting right now. Please try again.", 
+        text: "I'm here to listen and support you. Would you like to tell me more?", 
         isUser: false 
       }]);
     } finally {
