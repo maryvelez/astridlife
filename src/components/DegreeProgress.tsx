@@ -7,33 +7,25 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Select } from './ui/select';
 import { Session } from '@supabase/supabase-js';
+import { Profile, SchoolTask } from '@/types/database';
 
 interface DegreeProgressProps {
   session: Session;
-  profile: any; // TODO: Add proper type for profile
-}
-
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  due_date: string;
-  task_type: string;
-  progress: number;
+  profile: Profile;
 }
 
 interface NewTask {
   title: string;
   description: string;
   due_date: string;
-  task_type: string;
+  task_type: SchoolTask['task_type'];
   progress: number;
 }
 
 export default function DegreeProgress({ session, profile }: DegreeProgressProps) {
   const supabase = createClientComponentClient();
   const [degreeProgram, setDegreeProgram] = useState(profile?.degree_program || '');
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<SchoolTask[]>([]);
   const [newTask, setNewTask] = useState<NewTask>({
     title: '',
     description: '',
@@ -50,7 +42,7 @@ export default function DegreeProgress({ session, profile }: DegreeProgressProps
       .eq('user_id', session.user.id)
       .order('due_date', { ascending: true });
     
-    if (data) setTasks(data);
+    if (data) setTasks(data as SchoolTask[]);
   }, [session?.user?.id, supabase]);
 
   useEffect(() => {
@@ -68,7 +60,7 @@ export default function DegreeProgress({ session, profile }: DegreeProgressProps
   };
 
   // Add new task
-  const addTask = async (e) => {
+  const addTask = async (e: React.FormEvent) => {
     e.preventDefault();
     const { data } = await supabase
       .from('school_tasks')
@@ -79,7 +71,7 @@ export default function DegreeProgress({ session, profile }: DegreeProgressProps
       .select();
 
     if (data) {
-      setTasks([...tasks, data[0]]);
+      setTasks([...tasks, data[0] as SchoolTask]);
       setNewTask({
         title: '',
         description: '',
@@ -91,7 +83,7 @@ export default function DegreeProgress({ session, profile }: DegreeProgressProps
   };
 
   // Update task progress
-  const updateTaskProgress = async (taskId: number, progress: number) => {
+  const updateTaskProgress = async (taskId: string, progress: number) => {
     await supabase
       .from('school_tasks')
       .update({ progress })
@@ -141,7 +133,7 @@ export default function DegreeProgress({ session, profile }: DegreeProgressProps
             />
             <Select
               value={newTask.task_type}
-              onChange={(e) => setNewTask({...newTask, task_type: e.target.value})}
+              onChange={(e) => setNewTask({...newTask, task_type: e.target.value as SchoolTask['task_type']})}
             >
               <option value="assignment">Assignment</option>
               <option value="midterm">Midterm</option>
