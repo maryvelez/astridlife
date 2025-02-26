@@ -33,19 +33,23 @@ export default function MentalHealthChat() {
     try {
       console.log('Sending request with token:', process.env.NEXT_PUBLIC_HUGGING_FACE_TOKEN?.slice(0, 5) + '...');
       
-      const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-small', {
+      // Format the prompt to encourage appropriate, supportive responses
+      const safePrompt = `You are a kind and professional mental health supporter. Respond with empathy and care to: ${userMessage}`;
+      
+      const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-large', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${process.env.NEXT_PUBLIC_HUGGING_FACE_TOKEN?.trim()}`
         },
         body: JSON.stringify({
-          inputs: userMessage,
+          inputs: safePrompt,
           parameters: {
             max_length: 100,
             temperature: 0.7,
             top_p: 0.9,
-            repetition_penalty: 1.2
+            repetition_penalty: 1.2,
+            do_sample: true
           }
         })
       });
@@ -65,17 +69,25 @@ export default function MentalHealthChat() {
       } else if (typeof data === 'string') {
         botResponse = data;
       } else {
-        botResponse = "I'm here to help. What's on your mind?";
+        botResponse = "I'm here to support you. How can I help you today?";
       }
 
-      // Clean up the response
+      // Clean up and validate the response
       botResponse = botResponse
         .replace(/^"|"$/g, '') // Remove surrounding quotes
-        .replace(/\\n/g, '') // Remove newlines
+        .replace(/\\n/g, ' ') // Replace newlines with spaces
         .trim();
 
-      if (!botResponse) {
-        botResponse = "I'm here to help. What's on your mind?";
+      // Default supportive responses if the model fails
+      if (!botResponse || botResponse.length < 10) {
+        const supportiveResponses = [
+          "I'm here to support you. Would you like to tell me more about how you're feeling?",
+          "That sounds challenging. How can I help you process these feelings?",
+          "I hear you. Would you like to explore this further?",
+          "Your feelings are valid. Let's work through this together.",
+          "Thank you for sharing. What kind of support would be most helpful right now?"
+        ];
+        botResponse = supportiveResponses[Math.floor(Math.random() * supportiveResponses.length)];
       }
 
       setMessages(prev => [...prev, { text: botResponse, isUser: false }]);
