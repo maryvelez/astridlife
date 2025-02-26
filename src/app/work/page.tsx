@@ -19,7 +19,7 @@ interface Quote {
 }
 
 export default function WorkPage() {
-  const [quotes, setQuotes] = useState<Quote[]>([]);
+  const [quotes, setQuotes] = useState<Quote[]>([{ text: "Success is not final, failure is not fatal: it is the courage to continue that counts." }]);
   const [activeSection, setActiveSection] = useState('real-estate');
   const [items, setItems] = useState<FinanceItem[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -46,10 +46,12 @@ export default function WorkPage() {
           q.text.toLowerCase().includes('achieve')
         );
         const randomQuote = workQuotes[Math.floor(Math.random() * workQuotes.length)];
-        setQuotes([randomQuote]);
+        if (randomQuote) {
+          setQuotes([randomQuote]);
+        }
       })
       .catch(() => {
-        setQuotes([{ text: "Success is not final, failure is not fatal: it is the courage to continue that counts." }]);
+        // Keep the default quote
       });
   }, []);
 

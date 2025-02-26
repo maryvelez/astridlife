@@ -8,22 +8,24 @@ interface Quote {
 }
 
 export default function GrowthPage() {
-  const [quotes, setQuotes] = useState<Quote[]>([]);
-  
+  const [quotes, setQuotes] = useState<Quote[]>([{ text: "Growth is the only evidence of life." }]);
+
   useEffect(() => {
     fetch('https://type.fit/api/quotes')
       .then((response) => response.json())
       .then((data: Quote[]) => {
-        const growthQuotes = data.filter((q: Quote) => 
-          q.text.toLowerCase().includes('grow') || 
+        const growthQuotes = data.filter((q: Quote) =>
+          q.text.toLowerCase().includes('grow') ||
           q.text.toLowerCase().includes('learn') ||
           q.text.toLowerCase().includes('improve')
         );
         const randomQuote = growthQuotes[Math.floor(Math.random() * growthQuotes.length)];
-        setQuotes([randomQuote]);
+        if (randomQuote) {
+          setQuotes([randomQuote]);
+        }
       })
       .catch(() => {
-        setQuotes([{ text: "Growth is the only evidence of life." }]);
+        // Keep the default quote
       });
   }, []);
 
