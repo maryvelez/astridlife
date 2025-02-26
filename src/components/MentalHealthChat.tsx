@@ -33,17 +33,16 @@ export default function MentalHealthChat() {
     try {
       console.log('Sending request with token:', process.env.NEXT_PUBLIC_HUGGING_FACE_TOKEN?.slice(0, 5) + '...');
       
-      const response = await fetch('https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill', {
+      const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-base', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_HUGGING_FACE_TOKEN}`
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_HUGGING_FACE_TOKEN?.trim()}`
         },
         body: JSON.stringify({
-          inputs: {
-            past_user_inputs: messages.filter(m => m.isUser).map(m => m.text).slice(-5),
-            generated_responses: messages.filter(m => !m.isUser).map(m => m.text).slice(-5),
-            text: userMessage
+          inputs: userMessage,
+          options: {
+            wait_for_model: true
           }
         })
       });
@@ -55,7 +54,15 @@ export default function MentalHealthChat() {
         throw new Error(data.error || 'Failed to get response');
       }
 
-      const botResponse = data.generated_text || "I'm not sure how to respond to that.";
+      let botResponse;
+      if (Array.isArray(data) && data[0]?.generated_text) {
+        botResponse = data[0].generated_text;
+      } else if (data.generated_text) {
+        botResponse = data.generated_text;
+      } else {
+        botResponse = "I'm not sure how to respond to that.";
+      }
+
       setMessages(prev => [...prev, { text: botResponse, isUser: false }]);
     } catch (error) {
       console.error('Error:', error);
