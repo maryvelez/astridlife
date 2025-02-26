@@ -12,7 +12,7 @@ export default function GoalsPage() {
           
           <div className="space-y-6">
             <div className="bg-amber-800/50 rounded-xl p-6">
-              <h2 className="text-xl text-amber-100 mb-4">Today's Progress</h2>
+              <h2 className="text-xl text-amber-100 mb-4">Today&apos;s Progress</h2>
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between mb-1">

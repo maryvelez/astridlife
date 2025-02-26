@@ -200,7 +200,7 @@ export default function Profile() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">What's your favorite place in the world?</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">What&apos;s your favorite place in the world?</label>
                   <textarea
                     className="w-full p-2 rounded border border-gray-200 focus:border-blue-300 focus:ring focus:ring-blue-200"
                     rows={2}
@@ -214,7 +214,7 @@ export default function Profile() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">What's your dream job?</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">What&apos;s your dream job?</label>
                   <textarea
                     className="w-full p-2 rounded border border-gray-200 focus:border-blue-300 focus:ring focus:ring-blue-200"
                     rows={2}
@@ -244,8 +244,8 @@ export default function Profile() {
             )}
           </div>
         </div>
-        <p className="text-gray-600">Let's personalize your experience</p>
-        <p className="text-gray-600">We'll use this to customize your dashboard</p>
+        <p className="text-gray-600">Let&apos;s personalize your experience</p>
+        <p className="text-gray-600">We&apos;ll use this to customize your dashboard</p>
       </div>
     </div>
   );
