@@ -86,11 +86,11 @@ export default function SchoolProgress() {
   }, [supabase, userProgram?.program_id, session?.user?.id, userProgram?.program?.total_credits]);
 
   useEffect(() => {
-    if (session?.user) {
+    if (session?.user?.id) {
       loadPrograms();
       loadUserProgram();
     }
-  }, [session?.user, loadPrograms, loadUserProgram]);
+  }, [session?.user?.id, loadPrograms, loadUserProgram]);
 
   useEffect(() => {
     if (userProgram) {
