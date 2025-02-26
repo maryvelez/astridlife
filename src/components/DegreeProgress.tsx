@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -18,38 +18,34 @@ export default function DegreeProgress({ session, profile }) {
   });
 
   // Load tasks
-  useEffect(() => {
-    if (session?.user) {
-      loadTasks();
-    }
-  }, [session]);
-
-  const loadTasks = async () => {
-    const { data, error } = await supabase
+  const loadTasks = useCallback(async () => {
+    const { data } = await supabase
       .from('school_tasks')
       .select('*')
       .eq('user_id', session.user.id)
       .order('due_date', { ascending: true });
     
     if (data) setTasks(data);
-  };
+  }, [session?.user?.id, supabase]);
+
+  useEffect(() => {
+    if (session?.user) {
+      loadTasks();
+    }
+  }, [session, loadTasks]);
 
   // Save degree program
   const saveDegreeProgram = async () => {
-    const { error } = await supabase
+    await supabase
       .from('profiles')
       .update({ degree_program: degreeProgram })
       .eq('id', session.user.id);
-    
-    if (!error) {
-      alert('Degree program saved!');
-    }
   };
 
   // Add new task
   const addTask = async (e) => {
     e.preventDefault();
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('school_tasks')
       .insert([{
         ...newTask,
@@ -71,16 +67,14 @@ export default function DegreeProgress({ session, profile }) {
 
   // Update task progress
   const updateTaskProgress = async (taskId, progress) => {
-    const { error } = await supabase
+    await supabase
       .from('school_tasks')
       .update({ progress })
       .eq('id', taskId);
 
-    if (!error) {
-      setTasks(tasks.map(task => 
-        task.id === taskId ? { ...task, progress } : task
-      ));
-    }
+    setTasks(tasks.map(task => 
+      task.id === taskId ? { ...task, progress } : task
+    ));
   };
 
   return (
