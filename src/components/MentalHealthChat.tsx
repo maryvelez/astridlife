@@ -33,7 +33,7 @@ export default function MentalHealthChat() {
     try {
       console.log('Sending request with token:', process.env.NEXT_PUBLIC_HUGGING_FACE_TOKEN?.slice(0, 5) + '...');
       
-      const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-base', {
+      const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-small', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -41,8 +41,11 @@ export default function MentalHealthChat() {
         },
         body: JSON.stringify({
           inputs: userMessage,
-          options: {
-            wait_for_model: true
+          parameters: {
+            max_length: 100,
+            temperature: 0.7,
+            top_p: 0.9,
+            repetition_penalty: 1.2
           }
         })
       });
@@ -59,8 +62,20 @@ export default function MentalHealthChat() {
         botResponse = data[0].generated_text;
       } else if (data.generated_text) {
         botResponse = data.generated_text;
+      } else if (typeof data === 'string') {
+        botResponse = data;
       } else {
-        botResponse = "I'm not sure how to respond to that.";
+        botResponse = "I'm here to help. What's on your mind?";
+      }
+
+      // Clean up the response
+      botResponse = botResponse
+        .replace(/^"|"$/g, '') // Remove surrounding quotes
+        .replace(/\\n/g, '') // Remove newlines
+        .trim();
+
+      if (!botResponse) {
+        botResponse = "I'm here to help. What's on your mind?";
       }
 
       setMessages(prev => [...prev, { text: botResponse, isUser: false }]);
