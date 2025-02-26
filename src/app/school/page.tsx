@@ -3,19 +3,29 @@
 import { useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
-import SchoolProgress from '@/components/SchoolProgress';
+import DegreeProgress from '@/components/DegreeProgress';
 import MentalHealthChat from '@/components/MentalHealthChat';
 
 export default function SchoolPage() {
   const supabase = createClientComponentClient();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState(null);
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         router.push('/login');
+      } else {
+        setSession(session);
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+        setProfile(profile);
       }
       setLoading(false);
     };
@@ -41,7 +51,7 @@ export default function SchoolPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Progress Section */}
           <div className="lg:col-span-2">
-            <SchoolProgress />
+            <DegreeProgress session={session} profile={profile} />
           </div>
 
           {/* Quick Stats */}
