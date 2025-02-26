@@ -86,7 +86,7 @@ export default function Bubbles() {
     { href: '/growth', icon: '🌱', label: 'Growth', angle: -Math.PI/2 },
     { href: '/school', icon: '📚', label: 'School', angle: Math.PI/2 },
     { href: '/social', icon: '👥', label: 'Social', angle: -5*Math.PI/6 }
-  ];
+  ].map(card => ({ ...card, key: card.href })); // Add key prop for React
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
@@ -124,7 +124,7 @@ export default function Bubbles() {
 
         return (
           <Link
-            key={card.href}
+            key={card.key}
             href={card.href}
             className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
               w-24 h-24 rounded-full bg-white/5 hover:bg-white/10 transition-all
