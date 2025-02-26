@@ -12,7 +12,7 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
-import Modal from './Modal'; // Import the new Modal component
+import Modal from '@/components/Modal'; // Import from the shared components directory
 
 ChartJS.register(
   CategoryScale,
