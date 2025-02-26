@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSupabase } from '@/app/supabase-provider';
 import { useRouter } from 'next/navigation';
 import SchoolProgress from '@/components/SchoolProgress';

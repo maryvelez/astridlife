@@ -99,6 +99,12 @@ export default function Bubbles() {
         <div className="aura-circle aura-circle-3"></div>
       </div>
 
+      {/* Welcome Message */}
+      <div className="absolute top-8 left-8 text-white/80">
+        <h1 className="text-2xl font-semibold">Welcome{profile?.name ? `, ${profile.name}` : ''}</h1>
+        <p className="text-sm mt-2">Your personal dashboard awaits</p>
+      </div>
+
       {/* Lock Button */}
       <div className="absolute top-4 right-4 z-10">
         <button
@@ -113,14 +119,18 @@ export default function Bubbles() {
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <div className="relative w-32 h-32 flex items-center justify-center">
           <div className="text-6xl animate-float">🧠</div>
+          {profile && (
+            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-lg text-white">
+              {profile.name}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Orbiting Cards */}
-      {brainCards.map((card, index) => {
-        const radius = 180; // Distance from center
-        const x = Math.cos(card.angle) * radius;
-        const y = Math.sin(card.angle) * radius;
+      {brainCards.map((card) => {
+        const x = 150 * Math.cos(card.angle);
+        const y = 150 * Math.sin(card.angle);
 
         return (
           <Link
