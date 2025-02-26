@@ -80,13 +80,13 @@ export default function Bubbles() {
     );
   }
 
-  const brainCards = [
-    { href: '/work', icon: '💼', label: 'Work', angle: -Math.PI/6 },
-    { href: '/health', icon: '🧘‍♀️', label: 'Health', angle: Math.PI/6 },
-    { href: '/growth', icon: '🌱', label: 'Growth', angle: -Math.PI/2 },
-    { href: '/school', icon: '📚', label: 'School', angle: Math.PI/2 },
-    { href: '/social', icon: '👥', label: 'Social', angle: -5*Math.PI/6 }
-  ].map(card => ({ ...card, key: card.href })); // Add key prop for React
+  const bubbles = [
+    { href: '/work', icon: '💼', label: 'Work' },
+    { href: '/health', icon: '🧘‍♀️', label: 'Health' },
+    { href: '/growth', icon: '🌱', label: 'Growth' },
+    { href: '/school', icon: '📚', label: 'School' },
+    { href: '/social', icon: '👥', label: 'Social' }
+  ];
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
@@ -99,12 +99,6 @@ export default function Bubbles() {
         <div className="aura-circle aura-circle-3"></div>
       </div>
 
-      {/* Welcome Message */}
-      <div className="absolute top-8 left-8 text-white/80">
-        <h1 className="text-2xl font-semibold">Welcome{profile?.name ? `, ${profile.name}` : ''}</h1>
-        <p className="text-sm mt-2">Your personal dashboard awaits</p>
-      </div>
-
       {/* Lock Button */}
       <div className="absolute top-4 right-4 z-10">
         <button
@@ -115,43 +109,26 @@ export default function Bubbles() {
         </button>
       </div>
 
-      {/* Center Brain Icon */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <div className="relative w-32 h-32 flex items-center justify-center">
-          <div className="text-6xl animate-float">🧠</div>
-          {profile && (
-            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-lg text-white">
-              {profile.name}
-            </div>
-          )}
+      {/* Bubbles Grid */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="grid grid-cols-3 gap-8">
+          {bubbles.map((bubble) => (
+            <Link
+              key={bubble.href}
+              href={bubble.href}
+              className="w-24 h-24 rounded-full bg-white/5 hover:bg-white/10 transition-all
+                flex flex-col items-center justify-center text-white
+                hover:scale-110 hover:shadow-lg hover:shadow-purple-500/20"
+            >
+              <span role="img" aria-label={bubble.label} className="text-3xl mb-1">{bubble.icon}</span>
+              <span className="text-sm font-medium">{bubble.label}</span>
+            </Link>
+          ))}
         </div>
       </div>
 
-      {/* Orbiting Cards */}
-      {brainCards.map((card) => {
-        const x = 150 * Math.cos(card.angle);
-        const y = 150 * Math.sin(card.angle);
-
-        return (
-          <Link
-            key={card.key}
-            href={card.href}
-            className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-              w-24 h-24 rounded-full bg-white/5 hover:bg-white/10 transition-all
-              flex flex-col items-center justify-center text-white
-              hover:scale-110 hover:shadow-lg hover:shadow-purple-500/20`}
-            style={{
-              transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
-            }}
-          >
-            <span role="img" aria-label={card.label} className="text-3xl mb-1">{card.icon}</span>
-            <span className="text-sm font-medium">{card.label}</span>
-          </Link>
-        );
-      })}
-
       {/* Mental Health Chat */}
-      <div className="fixed bottom-8 right-8">
+      <div className="fixed bottom-8 right-8 z-50">
         <MentalHealthChat />
       </div>
     </div>
