@@ -31,35 +31,24 @@ export default function MentalHealthChat() {
     setIsLoading(true);
 
     try {
-      // Free mental health response generation using Hugging Face
       const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${process.env.NEXT_PUBLIC_HUGGING_FACE_TOKEN}`
         },
-        body: JSON.stringify({
-          inputs: {
-            text: `You are a kind and empathetic mental health friend. User says: ${userMessage}`
-          }
-        })
+        body: JSON.stringify({ inputs: userMessage })
       });
 
       const data = await response.json();
-      let botResponse = data[0]?.generated_text || "I'm here to listen. Would you like to tell me more?";
-      
-      // Clean up the response
-      botResponse = botResponse.replace(/User says:.*$/, '').trim();
+      const botResponse = data[0]?.generated_text || "I'm not sure how to respond to that.";
       
       setMessages(prev => [...prev, { text: botResponse, isUser: false }]);
-    } catch (error) {
-      setMessages(prev => [...prev, { 
-        text: "I'm here to listen. Would you like to tell me more?", 
-        isUser: false 
-      }]);
+    } catch {
+      setMessages(prev => [...prev, { text: "Sorry, I'm having trouble connecting right now.", isUser: false }]);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (

@@ -219,7 +219,7 @@ export default function HealthPage() {
         {/* Today's Entries */}
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-2">
-            <h3 className="font-medium text-emerald-900">Today's Food</h3>
+            <h3 className="font-medium text-emerald-900">Today&apos;s Food</h3>
             {entries.food.map((entry, i) => (
               <div key={i} className="bg-white/80 p-3 rounded-lg shadow-sm">
                 {entry.value}
@@ -227,7 +227,7 @@ export default function HealthPage() {
             ))}
           </div>
           <div className="space-y-2">
-            <h3 className="font-medium text-indigo-900">Today's Meditation</h3>
+            <h3 className="font-medium text-indigo-900">Today&apos;s Meditation</h3>
             {entries.meditation.map((entry, i) => (
               <div key={i} className="bg-white/80 p-3 rounded-lg shadow-sm">
                 {entry.value}
@@ -235,7 +235,7 @@ export default function HealthPage() {
             ))}
           </div>
           <div className="space-y-2">
-            <h3 className="font-medium text-amber-900">Today's Activities</h3>
+            <h3 className="font-medium text-amber-900">Today&apos;s Activities</h3>
             {entries.activity.map((entry, i) => (
               <div key={i} className="bg-white/80 p-3 rounded-lg shadow-sm">
                 <div>{entry.value}</div>

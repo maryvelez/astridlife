@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 interface ProfileData {
   name: string;
@@ -245,6 +244,8 @@ export default function Profile() {
             )}
           </div>
         </div>
+        <p className="text-gray-600">Let&apos;s personalize your experience</p>
+        <p className="text-gray-600">We&apos;ll use this to customize your dashboard</p>
       </div>
     </div>
   );

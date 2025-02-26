@@ -9,8 +9,16 @@ interface TemplateProps {
   children: React.ReactNode;
 }
 
+interface User {
+  id: string;
+  email?: string;
+  user_metadata?: {
+    name?: string;
+  };
+}
+
 export default function Template({ children }: TemplateProps) {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const supabase = createClientComponentClient();
   const pathname = usePathname();
 

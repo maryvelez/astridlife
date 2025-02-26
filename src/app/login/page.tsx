@@ -61,8 +61,9 @@ export default function LoginPage() {
         if (error) throw error;
         router.push('/bubbles');
       }
-    } catch (error: any) {
-      setError({ message: error.message });
+    } catch (error) {
+      const authError = error as AuthError;
+      setError({ message: authError.message || 'An error occurred during authentication' });
     } finally {
       setLoading(false);
     }
