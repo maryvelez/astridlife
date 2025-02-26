@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import Modal from '../../components/Modal';
+import Modal from '../../../components/Modal';
 import { Line, Pie } from 'react-chartjs-2';
 import Header from '../../../components/Header';
 import Link from 'next/link';
