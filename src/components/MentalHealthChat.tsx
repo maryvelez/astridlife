@@ -14,6 +14,11 @@ export default function MentalHealthChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationContext, setConversationContext] = useState({
+    hasIntroduced: false,
+    lastTopic: '',
+    messageCount: 0
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -24,82 +29,73 @@ export default function MentalHealthChat() {
     scrollToBottom();
   }, [messages]);
 
+  const getContextualResponse = (userMessage: string, context: typeof conversationContext) => {
+    const message = userMessage.toLowerCase();
+
+    // First-time greeting
+    if (!context.hasIntroduced && message.match(/^(hi|hello|hey|good|hi there)/i)) {
+      setConversationContext(prev => ({ ...prev, hasIntroduced: true }));
+      return "Hi there! 👋 I'm your mental health friend. I'm here to listen and chat with you about anything that's on your mind. How are you feeling today?";
+    }
+
+    // Follow-up to how are you feeling
+    if (context.messageCount === 1 && context.hasIntroduced) {
+      if (message.match(/good|great|okay|fine|alright|well/i)) {
+        return "That's good to hear! Remember, I'm here if you ever want to talk about anything specific. What's been helping you feel that way?";
+      } else if (message.match(/bad|not good|terrible|awful|sad|depressed|anxious|stressed/i)) {
+        setConversationContext(prev => ({ ...prev, lastTopic: 'negative_emotion' }));
+        return "I hear you, and it's completely okay to feel that way. Sometimes just acknowledging our feelings is an important first step. Would you like to tell me more about what's been going on?";
+      }
+    }
+
+    // If they're sharing a problem
+    if (message.length > 30 || message.includes('because') || message.includes('feel')) {
+      const responses = [
+        "Thank you for opening up to me about this. It takes courage to share these feelings. What do you think would help you feel even a tiny bit better right now?",
+        "I can hear how challenging this is for you. You're not alone in feeling this way. What kind of support would be most helpful at this moment?",
+        "It makes sense that you're feeling this way. Sometimes talking about it can help - would you like to explore this a bit more?",
+        "I'm really glad you're sharing this with me. Let's take it one step at a time. What's the hardest part about this for you?"
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
+    }
+
+    // If they're asking for advice
+    if (message.match(/advice|help|don't know|what.*(should|can) i do/i)) {
+      return "Before I share some suggestions, I want to make sure I understand what you're going through. Could you tell me a bit more about the situation?";
+    }
+
+    // For shorter responses or questions
+    const contextualResponses = [
+      "Can you tell me more about that?",
+      "How long have you been feeling this way?",
+      "What thoughts come up when you think about this?",
+      "That sounds really challenging. What helps you cope when you feel this way?",
+      "I'm here to listen. Would you like to explore this further?"
+    ];
+    return contextualResponses[Math.floor(Math.random() * contextualResponses.length)];
+  };
+
   const handleSend = async () => {
     if (!newMessage.trim()) return;
 
-    const userMessage = newMessage.trim().toLowerCase();
+    const userMessage = newMessage.trim();
     setNewMessage('');
     setMessages(prev => [...prev, { text: userMessage, isUser: true }]);
     setIsLoading(true);
 
     try {
-      // Handle greetings
-      if (userMessage.match(/^(hi|hello|hey|good morning|good evening|good afternoon)$/i)) {
-        setMessages(prev => [...prev, { 
-          text: "Hi! I'm here to chat and support you. How are you feeling today?", 
-          isUser: false 
-        }]);
-        setIsLoading(false);
-        return;
-      }
-
-      // Handle "I am sad" or similar emotions
-      if (userMessage.match(/^(i'?m|i am|feeling|feel)\s+(sad|depressed|down|upset|anxious|worried|stressed)/i)) {
-        const responses = [
-          "I hear you, and it's completely valid to feel that way. Would you like to tell me more about what's making you feel this way?",
-          "I'm here to listen. Can you share what's been happening that's making you feel this way? Sometimes talking about it can help.",
-          "That must be really difficult. Would you like to explore what's contributing to these feelings? I'm here to support you.",
-          "Thank you for sharing that with me. It takes courage to express these feelings. What do you think triggered these emotions?"
-        ];
-        const response = responses[Math.floor(Math.random() * responses.length)];
-        setMessages(prev => [...prev, { text: response, isUser: false }]);
-        setIsLoading(false);
-        return;
-      }
-
-      // Handle "I need help" or similar requests
-      if (userMessage.match(/^(i need|help|can you|please|advice)/i)) {
-        const responses = [
-          "I'm here to help. What kind of support would be most helpful right now?",
-          "You're taking a positive step by reaching out. What's on your mind?",
-          "I'm listening and I want to help. Can you tell me more about what you're going through?",
-          "Thank you for reaching out. Let's work through this together. What's troubling you?"
-        ];
-        const response = responses[Math.floor(Math.random() * responses.length)];
-        
-        // Get relevant tips based on the message
-        const tips = getRelevantTips(userMessage);
-        
-        setMessages(prev => [...prev, { 
-          text: response, 
-          isUser: false,
-          tips: tips
-        }]);
-
-        // If message contains concerning keywords, add emergency resources
-        if (userMessage.match(/suicide|kill|die|end it|harm|hurt myself/i)) {
-          setMessages(prev => [...prev, { 
-            text: emergencyResources.join('\n'), 
-            isUser: false 
-          }]);
-        }
-
-        setIsLoading(false);
-        return;
-      }
-
-      // For other messages, use a supportive response and provide relevant tips
-      const supportiveResponses = [
-        "I'm listening. Can you tell me more about that?",
-        "Thank you for sharing. How long have you been feeling this way?",
-        "That sounds challenging. What do you think would help you feel better right now?",
-        "I hear you. Would you like to explore this further?",
-        "Your feelings are valid. What kind of support would be most helpful?",
-        "I'm here to support you. Would you like to talk more about what's on your mind?"
-      ];
+      // Get contextual response based on conversation state
+      const response = getContextualResponse(userMessage, conversationContext);
       
-      const response = supportiveResponses[Math.floor(Math.random() * supportiveResponses.length)];
-      const tips = getRelevantTips(userMessage);
+      // Update conversation context
+      setConversationContext(prev => ({
+        ...prev,
+        messageCount: prev.messageCount + 1,
+        lastTopic: userMessage.toLowerCase()
+      }));
+
+      // Get relevant tips if the message suggests emotional distress
+      const tips = userMessage.length > 20 ? getRelevantTips(userMessage) : [];
       
       setMessages(prev => [...prev, { 
         text: response, 
@@ -107,6 +103,13 @@ export default function MentalHealthChat() {
         tips: tips.length > 0 ? tips : undefined
       }]);
 
+      // Check for crisis keywords
+      if (userMessage.match(/suicide|kill|die|end it|harm|hurt myself/i)) {
+        setMessages(prev => [...prev, { 
+          text: emergencyResources.join('\n'), 
+          isUser: false 
+        }]);
+      }
     } catch (error) {
       console.error('Error:', error);
       setMessages(prev => [...prev, { 
