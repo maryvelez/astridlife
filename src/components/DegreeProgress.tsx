@@ -4,12 +4,35 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Select } from './ui/select';
+import { Session } from '@supabase/supabase-js';
 
-export default function DegreeProgress({ session, profile }) {
+interface DegreeProgressProps {
+  session: Session;
+  profile: any; // TODO: Add proper type for profile
+}
+
+interface Task {
+  id: number;
+  title: string;
+  description: string;
+  due_date: string;
+  task_type: string;
+  progress: number;
+}
+
+interface NewTask {
+  title: string;
+  description: string;
+  due_date: string;
+  task_type: string;
+  progress: number;
+}
+
+export default function DegreeProgress({ session, profile }: DegreeProgressProps) {
   const supabase = createClientComponentClient();
   const [degreeProgram, setDegreeProgram] = useState(profile?.degree_program || '');
-  const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState({
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [newTask, setNewTask] = useState<NewTask>({
     title: '',
     description: '',
     due_date: '',
@@ -66,7 +89,7 @@ export default function DegreeProgress({ session, profile }) {
   };
 
   // Update task progress
-  const updateTaskProgress = async (taskId, progress) => {
+  const updateTaskProgress = async (taskId: number, progress: number) => {
     await supabase
       .from('school_tasks')
       .update({ progress })

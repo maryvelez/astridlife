@@ -1,44 +1,25 @@
-'use client';
+'use server';
 
-import { useEffect, useState } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { useRouter } from 'next/navigation';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import DegreeProgress from '@/components/DegreeProgress';
 import MentalHealthChat from '@/components/MentalHealthChat';
 
-export default function SchoolPage() {
-  const supabase = createClientComponentClient();
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [session, setSession] = useState(null);
-  const [profile, setProfile] = useState(null);
+export default async function SchoolPage() {
+  const supabase = createServerComponentClient({ cookies });
+  const { data: { session } } = await supabase.auth.getSession();
 
-  useEffect(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.push('/login');
-      } else {
-        setSession(session);
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-        setProfile(profile);
-      }
-      setLoading(false);
-    };
-    getSession();
-  }, [supabase, router]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-600"></div>
-      </div>
-    );
+  if (!session) {
+    redirect('/login');
   }
+
+  // Get user's profile and degree info
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', session.user.id)
+    .single();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 to-blue-900 text-white">
