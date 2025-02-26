@@ -7,12 +7,6 @@ import Link from 'next/link';
 import MentalHealthChat from '@/components/MentalHealthChat';
 import ProfileSetup from '@/components/ProfileSetup';
 
-interface Profile {
-  id: string;
-  name: string | null;
-  age: number | null;
-}
-
 export default function Bubbles() {
   const [profile, setProfile] = useState<{
     id: string;

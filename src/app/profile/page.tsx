@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 
 interface ProfileData {
@@ -244,8 +244,8 @@ export default function Profile() {
             )}
           </div>
         </div>
-        <p className="text-gray-600">Let&apos;s personalize your experience</p>
-        <p className="text-gray-600">We&apos;ll use this to customize your dashboard</p>
+        <p className="text-gray-600">Let's personalize your experience</p>
+        <p className="text-gray-600">We'll use this to customize your dashboard</p>
       </div>
     </div>
   );
