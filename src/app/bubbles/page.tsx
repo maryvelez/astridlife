@@ -8,6 +8,11 @@ import MentalHealthChat from '@/components/MentalHealthChat';
 import ProfileSetup from '@/components/ProfileSetup';
 
 export default function Bubbles() {
+  const [profile, setProfile] = useState<{
+    id: string;
+    name: string;
+    age: number;
+  } | null>(null);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [loading, setLoading] = useState(true);
   const supabase = createClientComponentClient();
@@ -36,6 +41,8 @@ export default function Bubbles() {
 
         if (!profile || (profile.name === null && profile.age === null)) {
           setShowProfileSetup(true);
+        } else {
+          setProfile(profile);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -51,7 +58,17 @@ export default function Bubbles() {
     router.push('/');
   };
 
-  const handleProfileComplete = () => {
+  const handleProfileComplete = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
+
+    setProfile(profile);
     setShowProfileSetup(false);
   };
 
@@ -64,11 +81,11 @@ export default function Bubbles() {
   }
 
   const bubbles = [
-    { href: '/work', icon: '💼', label: 'Work' },
-    { href: '/health', icon: '🧘‍♀️', label: 'Health' },
-    { href: '/growth', icon: '🌱', label: 'Growth' },
-    { href: '/school', icon: '📚', label: 'School' },
-    { href: '/social', icon: '👥', label: 'Social' }
+    { href: '/work', icon: '💼', label: 'Work', angle: -Math.PI/6 },
+    { href: '/health', icon: '🧘‍♀️', label: 'Health', angle: Math.PI/6 },
+    { href: '/growth', icon: '🌱', label: 'Growth', angle: -Math.PI/2 },
+    { href: '/school', icon: '📚', label: 'School', angle: Math.PI/2 },
+    { href: '/social', icon: '👥', label: 'Social', angle: -5*Math.PI/6 }
   ];
 
   return (
@@ -92,23 +109,38 @@ export default function Bubbles() {
         </button>
       </div>
 
-      {/* Bubbles Grid */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="grid grid-cols-3 gap-8">
-          {bubbles.map((bubble) => (
-            <Link
-              key={bubble.href}
-              href={bubble.href}
-              className="w-24 h-24 rounded-full bg-white/5 hover:bg-white/10 transition-all
-                flex flex-col items-center justify-center text-white
-                hover:scale-110 hover:shadow-lg hover:shadow-purple-500/20"
-            >
-              <span role="img" aria-label={bubble.label} className="text-3xl mb-1">{bubble.icon}</span>
-              <span className="text-sm font-medium">{bubble.label}</span>
-            </Link>
-          ))}
+      {/* Center Profile */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <div className="w-32 h-32 rounded-full bg-white/5 flex flex-col items-center justify-center text-white">
+          <div className="text-lg font-medium">Hi {profile?.name}</div>
+          <div className="text-sm text-white/60">{profile?.age}</div>
         </div>
       </div>
+
+      {/* Orbiting Bubbles */}
+      {bubbles.map((bubble) => {
+        const radius = 180; // Distance from center
+        const x = Math.cos(bubble.angle) * radius;
+        const y = Math.sin(bubble.angle) * radius;
+
+        return (
+          <Link
+            key={bubble.href}
+            href={bubble.href}
+            className="absolute w-24 h-24 rounded-full bg-white/5 hover:bg-white/10 transition-all
+              flex flex-col items-center justify-center text-white
+              hover:scale-110 hover:shadow-lg hover:shadow-purple-500/20"
+            style={{
+              transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
+              left: '50%',
+              top: '50%'
+            }}
+          >
+            <span role="img" aria-label={bubble.label} className="text-3xl mb-1">{bubble.icon}</span>
+            <span className="text-sm font-medium">{bubble.label}</span>
+          </Link>
+        );
+      })}
 
       {/* Mental Health Chat */}
       <div className="fixed bottom-8 right-8 z-50">
