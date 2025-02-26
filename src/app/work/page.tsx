@@ -13,8 +13,13 @@ interface FinanceItem {
   status?: string;
 }
 
+interface Quote {
+  text: string;
+  author?: string;
+}
+
 export default function WorkPage() {
-  const [quote, setQuote] = useState('');
+  const [quotes, setQuotes] = useState<Quote[]>([]);
   const [activeSection, setActiveSection] = useState('real-estate');
   const [items, setItems] = useState<FinanceItem[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -34,17 +39,17 @@ export default function WorkPage() {
 
     fetch('https://type.fit/api/quotes')
       .then((response) => response.json())
-      .then((data) => {
-        const workQuotes = data.filter(q => 
+      .then((data: Quote[]) => {
+        const workQuotes = data.filter((q: Quote) => 
           q.text.toLowerCase().includes('work') || 
           q.text.toLowerCase().includes('success') ||
           q.text.toLowerCase().includes('achieve')
         );
         const randomQuote = workQuotes[Math.floor(Math.random() * workQuotes.length)];
-        setQuote(randomQuote.text);
+        setQuotes([randomQuote]);
       })
       .catch(() => {
-        setQuote("Success is not final, failure is not fatal: it is the courage to continue that counts.");
+        setQuotes([{ text: "Success is not final, failure is not fatal: it is the courage to continue that counts." }]);
       });
   }, []);
 
@@ -88,7 +93,9 @@ export default function WorkPage() {
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Quote Section */}
         <div className="bg-white rounded-xl p-6 shadow-lg">
-          <p className="text-gray-600 italic text-center">{quote}</p>
+          <blockquote className="text-2xl font-light text-blue-900 italic mb-8 p-6 bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg shadow-lg">
+            {quotes[0]?.text}
+          </blockquote>
         </div>
 
         {/* Navigation */}
