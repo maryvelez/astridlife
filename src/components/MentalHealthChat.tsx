@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { getRelevantTips, emergencyResources } from '@/utils/mentalHealthResources';
 
 interface Message {
   text: string;
   isUser: boolean;
+  tips?: string[];
 }
 
 export default function MentalHealthChat() {
@@ -56,7 +58,7 @@ export default function MentalHealthChat() {
       }
 
       // Handle "I need help" or similar requests
-      if (userMessage.match(/^(i need|help|can you|please)/i)) {
+      if (userMessage.match(/^(i need|help|can you|please|advice)/i)) {
         const responses = [
           "I'm here to help. What kind of support would be most helpful right now?",
           "You're taking a positive step by reaching out. What's on your mind?",
@@ -64,12 +66,29 @@ export default function MentalHealthChat() {
           "Thank you for reaching out. Let's work through this together. What's troubling you?"
         ];
         const response = responses[Math.floor(Math.random() * responses.length)];
-        setMessages(prev => [...prev, { text: response, isUser: false }]);
+        
+        // Get relevant tips based on the message
+        const tips = getRelevantTips(userMessage);
+        
+        setMessages(prev => [...prev, { 
+          text: response, 
+          isUser: false,
+          tips: tips
+        }]);
+
+        // If message contains concerning keywords, add emergency resources
+        if (userMessage.match(/suicide|kill|die|end it|harm|hurt myself/i)) {
+          setMessages(prev => [...prev, { 
+            text: emergencyResources.join('\n'), 
+            isUser: false 
+          }]);
+        }
+
         setIsLoading(false);
         return;
       }
 
-      // For other messages, use a supportive response
+      // For other messages, use a supportive response and provide relevant tips
       const supportiveResponses = [
         "I'm listening. Can you tell me more about that?",
         "Thank you for sharing. How long have you been feeling this way?",
@@ -80,7 +99,13 @@ export default function MentalHealthChat() {
       ];
       
       const response = supportiveResponses[Math.floor(Math.random() * supportiveResponses.length)];
-      setMessages(prev => [...prev, { text: response, isUser: false }]);
+      const tips = getRelevantTips(userMessage);
+      
+      setMessages(prev => [...prev, { 
+        text: response, 
+        isUser: false,
+        tips: tips.length > 0 ? tips : undefined
+      }]);
 
     } catch (error) {
       console.error('Error:', error);
@@ -129,14 +154,26 @@ export default function MentalHealthChat() {
                 key={index}
                 className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
               >
-                <div
-                  className={`max-w-[80%] p-3 rounded-2xl ${
-                    message.isUser
-                      ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white'
-                      : 'bg-white/10 text-white'
-                  }`}
-                >
-                  {message.text}
+                <div className="space-y-2 max-w-[80%]">
+                  <div
+                    className={`p-3 rounded-2xl ${
+                      message.isUser
+                        ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white'
+                        : 'bg-white/10 text-white'
+                    }`}
+                  >
+                    {message.text}
+                  </div>
+                  {message.tips && (
+                    <div className="bg-white/5 p-3 rounded-xl space-y-2">
+                      <p className="text-blue-300 font-medium">Helpful tips:</p>
+                      <ul className="list-disc list-inside space-y-1 text-white/90">
+                        {message.tips.map((tip, i) => (
+                          <li key={i} className="text-sm">{tip}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
